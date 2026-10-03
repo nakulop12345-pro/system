@@ -1,0 +1,73 @@
+:root{--bg:#04060c;--pn:rgba(10,16,28,.62);--ln:rgba(150,180,240,.16);--tx:#d9e2f2;--dim:#8d9bb5;--ac:#9dbcff;font-family:"Avenir Next","Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);overflow:hidden;font-size:14px}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+#labels{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;left:0;top:0;will-change:transform;pointer-events:auto;cursor:pointer}
+.lbl span{display:inline-block;transform:translate(-50%,-2.3em);font-size:11px;letter-spacing:.06em;color:#cfdcf5;text-shadow:0 0 4px #000,0 0 8px #000;padding:2px 4px}
+.lbl.moon span{font-size:10px;color:#9fb0cf}
+.panel{position:fixed;background:var(--pn);border:1px solid var(--ln);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:10px;transition:opacity .4s,transform .4s}
+button,select,input[type=search],input[type=datetime-local]{font:inherit;color:var(--tx);background:rgba(255,255,255,.05);border:1px solid var(--ln);border-radius:6px;padding:6px 10px;cursor:pointer;transition:background .2s,border-color .2s}
+button:hover,select:hover{background:rgba(157,188,255,.15);border-color:var(--ac)}
+button:focus-visible,select:focus-visible,input:focus-visible,.lbl:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.primary{background:rgba(157,188,255,.2);border-color:var(--ac)}
+#top{top:10px;left:10px;right:10px;height:54px;display:flex;align-items:center;gap:16px;padding:0 14px;justify-content:space-between}
+.brand b{display:block;font-weight:600;letter-spacing:.22em;font-size:13px}
+.brand small{color:var(--dim);font-size:11px;letter-spacing:.08em}
+.clock{display:flex;flex-direction:column;align-items:center;font-variant-numeric:tabular-nums}
+.clock time{font-size:15px;letter-spacing:.04em}.clock span{font-size:11px;color:var(--dim)}
+nav{display:flex;gap:6px}
+#list{top:74px;left:10px;bottom:84px;width:210px;padding:10px;display:flex;flex-direction:column;gap:8px}
+#search{width:100%;cursor:text}
+#objs{list-style:none;margin:0;padding:0;overflow:auto;flex:1}
+#objs button{width:100%;text-align:left;border:0;background:none;padding:5px 8px;border-radius:5px}
+#objs li.m button{padding-left:22px;color:var(--dim);font-size:13px}
+#objs button.on{background:rgba(157,188,255,.22);color:#fff}
+#info{top:74px;right:10px;width:310px;max-height:calc(100% - 170px);overflow:auto;padding:16px}
+#info h2{margin:0;font-size:22px;font-weight:500;letter-spacing:.08em}
+#info h3{margin:14px 0 4px;font-size:11px;font-weight:600;color:var(--ac);letter-spacing:.14em}
+#iType{margin:2px 0 0;color:var(--dim)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0;font-size:13px}
+dt{color:var(--dim)}dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.fact{font-size:13px;line-height:1.5;color:#b8c6e0;border-left:2px solid var(--ac);padding-left:10px;margin:14px 0}
+.x{position:absolute;top:10px;right:10px;padding:0 8px;font-size:18px}
+#info[hidden]{display:none}
+#bar{bottom:30px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;padding:8px 12px;flex-wrap:wrap;justify-content:center;max-width:calc(100% - 20px)}
+#bar label{display:flex;gap:6px;align-items:center;color:var(--dim)}
+#credit{position:fixed;bottom:8px;width:100%;text-align:center;font-size:11px;color:var(--dim);pointer-events:none;transition:opacity .4s}
+#obsExit{position:fixed;top:12px;right:12px;opacity:0;pointer-events:none;transition:opacity .4s}
+body.obs #top,body.obs #list,body.obs #info,body.obs #bar,body.obs #labels{opacity:0;pointer-events:none}
+body.obs #obsExit{opacity:.7;pointer-events:auto}
+dialog{background:#0b1220;color:var(--tx);border:1px solid var(--ln);border-radius:12px;max-width:520px;width:calc(100% - 32px);line-height:1.55}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+dialog h2{margin-top:0;font-weight:500;letter-spacing:.06em}
+dialog label{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:10px 0}
+#loader{position:fixed;inset:0;z-index:10;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .7s;text-align:center;padding:20px}
+#loader.done{opacity:0;pointer-events:none}
+#loader h1{font-weight:300;letter-spacing:.35em;font-size:clamp(14px,3vw,22px);margin:0}
+.bar{width:min(340px,80vw);height:2px;background:var(--ln)}.bar i{display:block;height:100%;width:0;background:var(--ac);transition:width .3s}
+#lstage{color:var(--dim);margin:0;font-size:12px}#lerr{color:#ffb4a8;max-width:460px}
+@media (max-width:800px){
+ .brand small,.clock span,#credit{display:none}
+ #top{gap:6px;padding:0 8px}nav button{padding:5px 7px;font-size:12px}
+ #list{width:min(240px,70vw);z-index:3}
+ body.hidelist-m #list{display:none}
+ #info{top:auto;right:10px;left:10px;bottom:140px;width:auto;max-height:36vh}
+ #bar{bottom:10px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+#hud,#eclBanner{position:fixed;left:50%;transform:translateX(-50%);max-width:min(620px,calc(100% - 24px));text-align:center;padding:8px 14px;background:var(--pn);border:1px solid var(--ln);border-radius:8px;backdrop-filter:blur(12px);font-size:13px;line-height:1.45}
+#hud{top:70px}#eclBanner{bottom:92px}
+#hud[hidden],#eclBanner[hidden]{display:none}
+body.obs #hud,body.obs #eclBanner{opacity:.85}
+.note{font-size:12px;color:var(--dim);margin:6px 0}
+dialog{max-height:88vh;overflow:auto}
+dialog h3{font-size:12px;color:var(--ac);letter-spacing:.1em;margin:16px 0 4px}
+.pair{display:flex;gap:8px}.pair select{flex:1}
+#cmpPre{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}#cmpPre button{font-size:12px;padding:3px 8px}
+#cmpDia{display:flex;gap:24px;align-items:flex-end;justify-content:center;flex-wrap:wrap;margin:8px 0}#cmpDia div{text-align:center}
+#cmpDia i{display:block;margin:0 auto 4px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#c9dcff,#2d4b86)}
+#cmpDia .note{flex-basis:100%;text-align:center}
+.scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:4px 6px;border-bottom:1px solid var(--ln);text-align:left}td:first-child{color:var(--dim)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+@media (max-width:800px){#top{height:auto;min-height:54px;flex-wrap:wrap;padding:6px 8px}nav{flex-wrap:wrap}#list{top:122px}#info{bottom:150px}#eclBanner{bottom:150px}#hud{top:118px}}
