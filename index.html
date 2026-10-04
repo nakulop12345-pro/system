@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NAKUL SOLAR SYSTEM — Interactive Astronomical Visualization</title>
+<link rel="stylesheet" href="css/style.css">
+<!-- Import map: guarantees the bare specifier "three" resolves (no "Failed to resolve module specifier" error). -->
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","satellite.js":"https://cdn.jsdelivr.net/npm/satellite.js@5.0.0/dist/satellite.es.js"}}
+</script>
+</head>
+<body class="hidelist-m">
+<canvas id="gl" aria-label="3D Solar System view"></canvas>
+<div id="labels" aria-hidden="true"></div>
+
+<div id="loader" role="status">
+  <h1>SOLAR SYSTEM INITIALIZATION</h1>
+  <div class="bar"><i id="lbar"></i></div>
+  <p id="lstage">Starting</p>
+  <p id="lerr" hidden></p>
+</div>
+
+<header id="top" class="panel">
+  <div class="brand"><b>NAKUL SOLAR SYSTEM</b><small>Interactive astronomical visualization</small></div>
+  <div class="clock"><time id="date">—</time><span id="spd">—</span></div>
+  <nav>
+    <button id="btnList" aria-label="Toggle object list">Objects</button>
+    <button id="btnCmp" aria-label="Compare and measure">Compare</button>
+    <button id="btnCin" aria-label="Cinematic tour">Cinematic</button>
+    <button id="btnObs" aria-label="Observatory mode">Observatory</button>
+    <button id="btnSet" aria-label="Settings">Settings</button>
+    <button id="btnAbout" aria-label="About and sources">Sources</button>
+  </nav>
+</header>
+
+<aside id="list" class="panel" aria-label="Solar System objects">
+  <input id="search" type="search" placeholder="Search Mars, Europa, Titan…" aria-label="Search objects" autocomplete="off">
+  <ul id="objs"></ul>
+</aside>
+
+<aside id="info" class="panel" hidden aria-live="polite">
+  <button id="closeInfo" class="x" aria-label="Close information panel">×</button>
+  <h2 id="iName"></h2>
+  <p id="iType"></p>
+  <h3>Scientific data (real values)</h3>
+  <dl id="iReal"></dl>
+  <h3>Visualization scale (not literal)</h3>
+  <dl id="iVis"></dl>
+  <p class="note">Sizes and Sun distances in the 3D view are chosen for readability. Orbit shapes, inclinations, periods and tilts are real.</p>
+  <div id="iLive" hidden>
+    <h3>Live coverage</h3>
+    <dl id="iLiveDl"></dl>
+    <canvas id="iMap" width="560" height="280" aria-label="ISS ground track and visibility footprint map"></canvas>
+    <p class="note">Visibility footprint = geometric horizon circle from the ISS altitude and Earth radius. It is not communications coverage.</p>
+  </div>
+  <p id="iFact" class="fact"></p>
+  <button id="focusBtn" class="primary">Focus camera</button>
+</aside>
+
+<div id="bar" class="panel">
+  <button id="play" aria-label="Play or pause">Pause</button>
+  <label>Speed
+    <select id="speed" aria-label="Simulation speed">
+      <option value="0.1">0.1× slow motion</option><option value="1">1× real time</option><option value="10">10×</option><option value="100">100×</option>
+      <option value="1000">1,000×</option><option value="10000">10,000×</option>
+      <option value="100000" selected>100,000×</option><option value="1000000">1,000,000×</option>
+    </select>
+  </label>
+  <input id="dt" type="datetime-local" aria-label="Simulation date and time (UTC)">
+  <button id="now">Today</button>
+  <button id="j2000">J2000</button>
+  <button id="eclipse">Eclipse demo</button>
+  <button id="home">Solar System view</button>
+</div>
+
+<div id="hud" hidden></div>
+<div id="eclBanner" hidden>Educational alignment only: the Moon is placed on the Sun–Earth line. Real eclipses need the Moon’s 5°-tilted orbit to cross the ecliptic at new moon, and this app does not predict them.</div>
+<footer id="credit">Created by Nakul Sharma · Not affiliated with NASA, ESA or JPL · Sizes and distances are not to scale</footer>
+<button id="obsExit" aria-label="Exit observatory mode">Exit observatory</button>
+
+<dialog id="settings"><form method="dialog">
+  <h2>Settings</h2>
+  <label>Graphics quality <select data-k="quality"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="ultra">Ultra</option></select></label>
+  <label>Star density <input type="range" data-k="stars" min="0.1" max="1" step="0.05"></label>
+  <label><input type="checkbox" data-k="atmo"> Planet atmospheres</label>
+  <label><input type="checkbox" data-k="orbits"> Orbit lines</label>
+  <label><input type="checkbox" data-k="moons"> Moons</label>
+  <label><input type="checkbox" data-k="glow"> Sun glow / corona</label>
+  <label><input type="checkbox" data-k="labels"> Labels</label>
+  <label><input type="checkbox" data-k="belt"> Asteroid belt</label>
+  <label><input type="checkbox" data-k="kuiper"> Kuiper belt</label>
+  <label><input type="checkbox" data-k="comets"> Comets</label>
+  <label><input type="checkbox" data-k="iss"> ISS</label>
+  <label><input type="checkbox" data-k="issTrack"> ISS ground track</label>
+  <label><input type="checkbox" data-k="bloom"> Bloom (expensive)</label>
+  <label><input type="checkbox" data-k="reduced"> Reduced motion</label>
+  <button class="primary">Close</button>
+</form></dialog>
+
+<dialog id="about"><form method="dialog">
+  <h2>About, sources and credits</h2>
+  <h3>Real astronomical values versus visualization scale</h3>
+  <p><b>Real:</b> orbital shape (semi-major axis, eccentricity, inclination), periods, rotation, axial tilt, diameters, masses, gravity, temperatures. <b>Visualization:</b> distances from the Sun are compressed (display = 40 × AU<sup>0.55</sup>), body sizes are exaggerated, and moon orbits are compressed around their planet. Nothing in the 3D view is literally to scale; the Compare dialog shows true relative diameters.</p>
+  <h3>Orbital model and limits</h3>
+  <p>Planets and Pluto use JPL J2000 Keplerian elements (E. M. Standish) advanced by mean motion and a Kepler solver, without secular rates, so accuracy declines far from the year 2000. Moons use circular orbits with arbitrary starting phases. Comets use approximate elements and a simplified visual model: tails are a heuristic particle effect, not physics. Belts are seeded visual distributions, not catalogued objects.</p>
+  <h3>Eclipse, distance and light-time tools</h3>
+  <p>The eclipse view is an educational alignment, not a prediction. Distances and light times come from the simplified model at the simulated time and are approximate.</p>
+  <h3>Sources</h3>
+  <p>Orbital elements: NASA/JPL SSD. Physical data: NASA Planetary Fact Sheet, JPL SSD satellite tables; values rounded. Moon counts change as discoveries are confirmed.</p>
+  <h3>Textures and licensing</h3>
+  <p>By default every surface is generated procedurally. Real textures load only from <code>assets/textures/</code> when listed in <code>manifest.json</code> and documented in ATTRIBUTIONS.md; any failure falls back to the procedural version. Not affiliated with NASA, ESA or JPL.</p>
+  <h3>Software</h3>
+  <p>Three.js r160 (MIT) with its EffectComposer and UnrealBloomPass add-ons, loaded from jsDelivr.</p>
+  <button class="primary">Close</button>
+</form></dialog>
+
+<dialog id="cmp"><form method="dialog">
+  <h2>Compare and measure</h2>
+  <div class="pair"><select id="cmpA" aria-label="Object A"></select><select id="cmpB" aria-label="Object B"></select></div>
+  <div id="cmpPre"></div>
+  <div id="cmpDia"></div>
+  <div class="scroll"><table id="cmpTab"></table></div>
+  <h3>Distance and light travel time</h3>
+  <p id="cmpDist"></p>
+  <p class="note" id="cmpNote"></p>
+  <div class="row"><button type="button" id="cmpGo" class="primary">Draw line and send light pulse</button><button type="button" id="cmpClr">Clear</button><button>Close</button></div>
+</form></dialog>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
