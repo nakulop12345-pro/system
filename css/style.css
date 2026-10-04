@@ -71,3 +71,4 @@ dialog h3{font-size:12px;color:var(--ac);letter-spacing:.1em;margin:16px 0 4px}
 .scroll{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{padding:4px 6px;border-bottom:1px solid var(--ln);text-align:left}td:first-child{color:var(--dim)}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 @media (max-width:800px){#top{height:auto;min-height:54px;flex-wrap:wrap;padding:6px 8px}nav{flex-wrap:wrap}#list{top:122px}#info{bottom:150px}#eclBanner{bottom:150px}#hud{top:118px}}
+#iMap{display:block;width:100%;height:auto;margin-top:8px;border:1px solid var(--ln);border-radius:6px;background:#0a1422}
